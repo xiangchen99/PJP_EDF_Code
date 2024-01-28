@@ -2,7 +2,7 @@ The Interface for the EDF
 
 This combines Pythong with Arduino to control the Arduino digitally using user input in a GUI. 
 
-How to run the code:
+#How to run the code:
 
 In terminal:
 1. pip install pyserial
