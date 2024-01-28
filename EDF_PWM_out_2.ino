@@ -11,6 +11,8 @@ const long FREQUENCY = 8000;
 const int MAX_PWM_BOUND = 90;
 const int MIN_PWM_BOUND = 60;
 int receivedDutyCycle;
+bool newDataReceived;
+int timer;
 
 const long timer1_OCR1A_Setting = F_CPU / FREQUENCY;
 void setup() 
@@ -22,11 +24,13 @@ void setup()
   TCCR1B = _BV (WGM12) | _BV (WGM13) | _BV (CS10);   // fast PWM, no prescaler
   // OCR1A will compare
   OCR1A =  timer1_OCR1A_Setting - 1;  // zero relative 
+  newDataReceived = false;
   }  // end of setup
 
 void loop() 
   { 
-  
+  //set a timer for printout debugging
+  timer = timer + 1;
   // Check for available serial data
   if (Serial.available()) {
     // Read the duty cycle value
@@ -35,16 +39,18 @@ void loop()
 
   // Validate the received value
   if (receivedDutyCycle < MIN_PWM_BOUND || receivedDutyCycle > MAX_PWM_BOUND) {
-    // Error handling
-    Serial.println("Invalid duty cycle received. Please enter a value between " 
-                    + String(MIN_PWM_BOUND) + " and " + String(MAX_PWM_BOUND) + ".");
-    return;
-  }
-
-  // Convert the duty cycle to a PWM value
-  long pwmValue = map(receivedDutyCycle, MIN_PWM_BOUND, MAX_PWM_BOUND, 
+    if (timer % 100 == 50){
+      // Error handling
+      Serial.println("Please enter a value between 60 and 90");
+      return;
+    }
+  } else {
+    // Convert the duty cycle to a PWM value
+    long pwmValue = map(receivedDutyCycle, MIN_PWM_BOUND, MAX_PWM_BOUND, 
                     0, 1023);
 
-  // Set the PWM output based on the received value
-  OCR1B = pwmValue;
+    // Set the PWM output based on the received value
+    OCR1B = pwmValue;
+  }
+  
   }
