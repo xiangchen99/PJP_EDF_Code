@@ -9,7 +9,8 @@ const byte POTENTIOMETER = A0;
 const long FREQUENCY = 8000;
 // set the bounds of the duty cycle of the PWM in %
 const int MAX_PWM_BOUND = 90;
-const int MIN_PWM_BOUND = 55;
+const int MIN_PWM_BOUND = 60;
+int receivedDutyCycle;
 
 const long timer1_OCR1A_Setting = F_CPU / FREQUENCY;
 void setup() 
@@ -25,12 +26,6 @@ void setup()
 
 void loop() 
   { 
-  // long POT_value = analogRead(POTENTIOMETER);
-  // // map function adds percentage bounds
-  // long POT_to_PWM = map(POT_value, 0.0, 1024.0, 1024.0*MIN_PWM_BOUND/100.0, 1024.0*MAX_PWM_BOUND/100.0);
-
-  // // alter Timer 1 duty cycle in accordance with pot reading
-  // OCR1B = (((long) (POT_to_PWM + 1) * timer1_OCR1A_Setting) / 1024L) - 1;
   
   // Check for available serial data
   if (Serial.available()) {
