@@ -3,6 +3,7 @@ import serial
 import time
 import threading
 from tkinter import StringVar
+import math
 
 # Define serial port and baud rate
 arduino_port = "/dev/cu.usbmodem1101"  # Replace with your actual port
@@ -76,6 +77,7 @@ window.geometry(f"{screen_width}x{screen_height}")
 slider = tk.Scale(window, from_=MIN_PWM_BOUND, to=MAX_PWM_BOUND, orient='horizontal', label="Duty Cycle", command=on_slider_change)
 slider.pack(pady=20)
 
+
 # Define entry field and Set button for direct input
 entry_field = tk.Entry(window, width=10)
 entry_field.pack(pady=10)
@@ -96,19 +98,13 @@ def read_from_arduino():
     while True:
         if ser.inWaiting() > 0:
             data_line = ser.readline().decode('utf-8').strip()
-            # Check if the data line starts with "Timer:"
             if data_line.startswith("Timer:"):
-                # Extract the timer value
                 timer_value = data_line.split("Timer:")[1].strip()
-                # Now you can use timer_value as needed
                 timer.set(f"Timer value from Arduino: {timer_value}")
             elif data_line.startswith("Speed:"):
-                # Extract the speed value
-                speed_value = data_line.split("Speed:")[1].strip()
-                # Now you can use speed_value as needed
+                speed_value = int(data_line.split("Speed:")[1].strip())
                 speed.set(f"Speed value from Arduino: {speed_value}")
             else:
-                # Handle other serial inputs here, if necessary
                 pass
 
 # Start the thread for reading serial data
