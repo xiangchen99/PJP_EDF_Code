@@ -16,23 +16,40 @@ MAX_PWM_BOUND = 90
 # Global variable to store the last sent signal
 lastSentSignal = 0
 
-# Delay update mechanism
+# Delay update mechanism for slider
 delayed_action_id = None
 
 # Define function to send duty cycle to Arduino
-def send_duty_cycle():
+def send_duty_cycle(event=None):
     global lastSentSignal
+    # Validate and set the duty cycle from the entry field if possible
     try:
-        duty_cycle = slider.get()
-        lastSentSignal = duty_cycle
-        if duty_cycle < MIN_PWM_BOUND or duty_cycle > MAX_PWM_BOUND:
-            raise ValueError(f"Invalid duty cycle. Please enter a value between {MIN_PWM_BOUND} and {MAX_PWM_BOUND}.")
-        ser.write(str(duty_cycle).encode())
-        print(f"Sent duty cycle: {duty_cycle}")
-        time.sleep(0.1)
-        update_last_sent_label()
-    except ValueError as error:
+        duty_cycle_text = entry_field.get()
+        if duty_cycle_text:  # Check if the entry field is not empty
+            duty_cycle = int(duty_cycle_text)
+            if MIN_PWM_BOUND <= duty_cycle <= MAX_PWM_BOUND:
+                # Update the slider and the global lastSentSignal
+                slider.set(duty_cycle)
+                lastSentSignal = duty_cycle
+                ser.write(str(duty_cycle).encode())
+                print(f"Sent duty cycle: {duty_cycle}")
+            else:
+                raise ValueError(f"Value out of range: Please enter a value between {MIN_PWM_BOUND} and {MAX_PWM_BOUND}.")
+        else:  # Fallback to slider value if no textbox input
+            duty_cycle = slider.get()
+            lastSentSignal = duty_cycle
+            ser.write(str(duty_cycle).encode())
+            print(f"Sent duty cycle: {duty_cycle}")
+
+        time.sleep(0.1)  # Short delay for Arduino processing
+        update_last_sent_label()  # Update the label with the last sent signal
+        entry_field.delete(0, tk.END)  # Clear the entry field after sending
+
+    except ValueError as error:  # Handle errors from invalid entry inputs
         print(error)
+        entry_field.delete(0, tk.END)  # Clear the entry field if error
+
+
 
 def update_last_sent_label():
     last_sent_label.config(text=f"Last Sent Speed: {lastSentSignal}")
@@ -54,9 +71,18 @@ screen_height = window.winfo_screenheight()
 window.geometry(f"{screen_width}x{screen_height}")
 
 # Define slider
-slider = tk.Scale(window, from_=MIN_PWM_BOUND, to=MAX_PWM_BOUND, orient='horizontal', label="Duty Cycle",
-                  command=on_slider_change)
+slider = tk.Scale(window, from_=MIN_PWM_BOUND, to=MAX_PWM_BOUND, orient='horizontal', label="Duty Cycle", command=on_slider_change)
 slider.pack(pady=20)
+
+# Define entry field and Set button for direct input
+entry_field = tk.Entry(window, width=10)
+entry_field.pack(pady=10)
+
+set_button = tk.Button(window, text="Set", command=send_duty_cycle)
+set_button.pack(pady=5)
+
+# Bind the Enter key to the send_duty_cycle function for the entry field
+entry_field.bind('<Return>', lambda event=None: send_duty_cycle())
 
 # Label to display the last sent speed
 last_sent_label = tk.Label(window, text="Current Speed: 0")
