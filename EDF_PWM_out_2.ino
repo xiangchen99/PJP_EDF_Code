@@ -13,6 +13,7 @@ const int MIN_PWM_BOUND = 60;
 int receivedDutyCycle;
 bool newDataReceived;
 int timer;
+int speed;
 
 const long timer1_OCR1A_Setting = F_CPU / FREQUENCY;
 void setup() 
@@ -31,6 +32,10 @@ void loop()
   { 
   //set a timer for printout debugging
   timer = timer + 1;
+  speed = speed + 1;
+  Serial.println("Timer: " + String(timer));
+  Serial.println("Speed:" + String(speed));
+  delay(1000);
   // Check for available serial data
   if (Serial.available()) {
     // Read the duty cycle value
@@ -41,7 +46,6 @@ void loop()
   if (receivedDutyCycle < MIN_PWM_BOUND || receivedDutyCycle > MAX_PWM_BOUND) {
     if (timer % 100 == 50){
       // Error handling
-      Serial.println("Please enter a value between 60 and 90");
       return;
     }
   } else {

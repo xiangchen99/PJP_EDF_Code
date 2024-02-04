@@ -84,15 +84,32 @@ set_button = tk.Button(window, text="Set", command=send_duty_cycle)
 set_button.pack(pady=5)
 
 # Getting received data
-received_data_var = StringVar()
-received_data_label = tk.Label(window, textvariable=received_data_var, text="Waiting for Arduino data...")
-received_data_label.pack(pady=10)
+timer = StringVar()
+timer_label = tk.Label(window, textvariable=timer, text="Waiting for Arduino data...")
+timer_label.pack(pady=10)
+
+speed = StringVar()
+speed_label = tk.Label(window, textvariable=speed, text="Waiting for Arduino data...")
+speed_label.pack(pady=10)
 
 def read_from_arduino():
     while True:
         if ser.inWaiting() > 0:
             data_line = ser.readline().decode('utf-8').strip()
-            received_data_var.set(f"Data from Arduino: {data_line}")
+            # Check if the data line starts with "Timer:"
+            if data_line.startswith("Timer:"):
+                # Extract the timer value
+                timer_value = data_line.split("Timer:")[1].strip()
+                # Now you can use timer_value as needed
+                timer.set(f"Timer value from Arduino: {timer_value}")
+            elif data_line.startswith("Speed:"):
+                # Extract the speed value
+                speed_value = data_line.split("Speed:")[1].strip()
+                # Now you can use speed_value as needed
+                speed.set(f"Speed value from Arduino: {speed_value}")
+            else:
+                # Handle other serial inputs here, if necessary
+                pass
 
 # Start the thread for reading serial data
 thread = threading.Thread(target=read_from_arduino, daemon=True)
