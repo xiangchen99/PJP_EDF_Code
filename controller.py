@@ -1,6 +1,8 @@
 import tkinter as tk
 import serial
 import time
+import threading
+from tkinter import StringVar
 
 # Define serial port and baud rate
 arduino_port = "/dev/cu.usbmodem1101"  # Replace with your actual port
@@ -80,6 +82,21 @@ entry_field.pack(pady=10)
 
 set_button = tk.Button(window, text="Set", command=send_duty_cycle)
 set_button.pack(pady=5)
+
+# Getting received data
+received_data_var = StringVar()
+received_data_label = tk.Label(window, textvariable=received_data_var, text="Waiting for Arduino data...")
+received_data_label.pack(pady=10)
+
+def read_from_arduino():
+    while True:
+        if ser.inWaiting() > 0:
+            data_line = ser.readline().decode('utf-8').strip()
+            received_data_var.set(f"Data from Arduino: {data_line}")
+
+# Start the thread for reading serial data
+thread = threading.Thread(target=read_from_arduino, daemon=True)
+thread.start()
 
 # Bind the Enter key to the send_duty_cycle function for the entry field
 entry_field.bind('<Return>', lambda event=None: send_duty_cycle())
