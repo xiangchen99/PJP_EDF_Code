@@ -5,10 +5,8 @@ This combines Python with Arduino to control the Arduino digitally using user in
 ## How to run the code:
 
 ### In terminal:
-1. pip install pyserial
-2. pip install serial
-3. pip install tkinter
+1. pip install pyserial, serial, tkinter
 
-4. Connect the Arduino and run the arduino code first
-5. In the python code, change the COM3 into what port it is actually connected to
-6. Run the python code
+2. Connect the Arduino and run the arduino code first
+3. In the python code, change the COM3 into what port it is actually connected to
+4. Run the python code
