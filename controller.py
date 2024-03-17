@@ -1,9 +1,11 @@
 import tkinter as tk
+from tkinter import StringVar
 import serial
 import time
 import threading
-from tkinter import StringVar
-import math
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
 
 # Define serial port and baud rate
 arduino_port = "/dev/cu.usbmodem1101"  # Replace with your actual port
@@ -18,6 +20,9 @@ MAX_PWM_BOUND = 90
 
 # Global variable to store the last sent signal
 lastSentSignal = 0
+times = []
+speeds = []
+receivedTimes = []
 
 # Delay update mechanism for slider
 delayed_action_id = None
@@ -68,6 +73,28 @@ def on_slider_change(val):
 window = tk.Tk()
 window.title("EDF Speed Control")
 
+# Define Matplotlib figure and axis
+fig = Figure(figsize=(5, 4), dpi=100)
+ax = fig.add_subplot(111)
+ax.set_xlabel('Time')
+ax.set_ylabel('Speed')
+line, = ax.plot(times, speeds, 'r')  # Initialize empty plot
+
+# Embed the plot into the Tkinter GUI
+canvas = FigureCanvasTkAgg(fig, master=window)  # A tk.DrawingArea.
+canvas.draw()
+canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+def update_plot():
+    """Redraw the plot with new data."""
+    if times and speeds:
+        # Set data for the line
+        line.set_data(times, speeds)
+        # Adjust plot limits
+        ax.relim()
+        ax.autoscale_view(True,True,True)
+        canvas.draw_idle()
+
 # Autoscale window size
 screen_width = window.winfo_screenwidth()
 screen_height = window.winfo_screenheight()
@@ -104,12 +131,21 @@ def read_from_arduino():
             elif data_line.startswith("Speed:"):
                 speed_value = int(data_line.split("Speed:")[1].strip())
                 speed.set(f"Speed value from Arduino: {speed_value}")
+                times.append(time.time()/1000)
+                speeds.append(speed_value)
             else:
                 pass
+def auto_update():
+    """Automatically update the plot."""
+    update_plot()
+    # Call auto_update again after a short delay
+    window.after(1000, auto_update)
 
 # Start the thread for reading serial data
 thread = threading.Thread(target=read_from_arduino, daemon=True)
 thread.start()
+
+auto_update()
 
 # Bind the Enter key to the send_duty_cycle function for the entry field
 entry_field.bind('<Return>', lambda event=None: send_duty_cycle())
