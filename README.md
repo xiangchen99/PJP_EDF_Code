@@ -17,3 +17,7 @@ First, make sure you are using the local Python 3.11 or newer (anything other th
 
 ## Things to note:
 The slider works perfectly, but **you need to enter the number twice in the textbox** for it to register
+
+
+## New Web Dev Steps
+pip install -r requirements.txt
