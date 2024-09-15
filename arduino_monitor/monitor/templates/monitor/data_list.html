@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sensor Data Chart</title>
+    <style>
+      /* Optional: Style the page */
+      body {
+        font-family: Arial, sans-serif;
+      }
+      h1 {
+        text-align: center;
+      }
+      #chart-container {
+        width: 80%;
+        margin: auto;
+      }
+    </style>
+    <!-- Include Chart.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@2.0.2/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
+  </head>
+  <body>
+    <h1>Real-Time Sensor Data</h1>
+    <div id="chart-container">
+      <canvas id="sensorChart"></canvas>
+    </div>
+
+    <script>
+      // Function to fetch data from the server
+      async function fetchData() {
+        console.log("fetchData called");
+        const response = await fetch("{% url 'sensor_data_json' %}?limit=50");
+        const data = await response.json();
+        return data;
+      }
+
+      // Function to create the chart
+      async function createChart() {
+        console.log("createChart called");
+        const data = await fetchData();
+
+        // Extract timestamps and values
+        const timestamps = data.map((entry) => new Date(entry.timestamp));
+        const values = data.map((entry) => entry.value);
+
+        const ctx = document.getElementById("sensorChart").getContext("2d");
+
+        // Create the chart
+        window.sensorChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: timestamps,
+            datasets: [
+              {
+                label: "Sensor Value",
+                data: values,
+                backgroundColor: "rgba(54, 162, 235, 0.2)", // Line fill color
+                borderColor: "rgba(54, 162, 235, 1)", // Line border color
+                borderWidth: 1,
+                tension: 0.1, // Smoothness of the line
+              },
+            ],
+          },
+          options: {
+            animation: false,
+            scales: {
+              x: {
+                type: "time",
+                time: {
+                  parser: "isoDateTime", // Use built-in parser
+                  tooltipFormat: "HH:mm:ss",
+                  unit: "second",
+                  displayFormats: {
+                    second: "HH:mm:ss",
+                  },
+                },
+                title: {
+                  display: true,
+                  text: "Timestamp",
+                },
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: "Sensor Value",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Function to update the chart
+      async function updateChart() {
+        console.log("updateChart called");
+        const data = await fetchData();
+
+        const timestamps = data.map((entry) => new Date(entry.timestamp));
+        const values = data.map((entry) => entry.value);
+
+        // Update chart data
+        window.sensorChart.data.labels = timestamps;
+        window.sensorChart.data.datasets[0].data = values;
+        window.sensorChart.update();
+      }
+
+      // Initialize the chart
+      createChart().then(() => {
+        // Set up periodic updates every 5 seconds after the chart is created
+        setInterval(updateChart, 500);
+      });
+    </script>
+  </body>
+</html>
