@@ -1,4 +1,6 @@
-# The Interface for the EDF
+# This is the prvious code for the EDF. 
+
+## The Interface for the EDF
 
 This combines Python with Arduino to control the Arduino digitally using user input in a GUI. 
 
