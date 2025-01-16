@@ -1,4 +1,5 @@
-# This is the prvious code for the EDF. 
+# This is the previous code for the EDF. The new edition of the code is available at:
+https://github.com/LanceGuy5/PJP_EDF_Code
 
 ## The Interface for the EDF
 
