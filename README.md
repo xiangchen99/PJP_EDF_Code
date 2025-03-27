@@ -1,5 +1,5 @@
 # This is the previous code for the EDF. Codes pertaining to the club will be in this organization:
-[https://github.com/LanceGuy5/PJP_EDF_Code](https://github.com/orgs/Penn-Jet-Propulsion/repositories)
+(https://github.com/orgs/Penn-Jet-Propulsion/repositories)
 
 ## The Interface for the EDF
 
