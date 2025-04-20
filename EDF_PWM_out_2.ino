@@ -30,31 +30,19 @@ void setup()
 
 void loop() 
   { 
-  //set a timer for printout debugging
-  timer = timer + 1;
-  speed = speed + 1;
-  Serial.println("Timer: " + String(timer));
-  Serial.println("Speed:" + String(speed));
-  delay(1000);
-  // Check for available serial data
-  if (Serial.available()) {
-    // Read the duty cycle value
-    receivedDutyCycle = Serial.parseInt();
-  }
+  int potValue = analogRead(POTENTIOMETER); // Reads from 0 to 1023
+  int dutyCycle = map(potValue, 0, 1023, MIN_PWM_BOUND, MAX_PWM_BOUND);
 
-  // Validate the received value
-  if (receivedDutyCycle < MIN_PWM_BOUND || receivedDutyCycle > MAX_PWM_BOUND) {
-    if (timer % 100 == 50){
-      // Error handling
-      return;
-    }
-  } else {
-    // Convert the duty cycle to a PWM value
-    long pwmValue = map(receivedDutyCycle, MIN_PWM_BOUND, MAX_PWM_BOUND, 
-                    0, 1023);
+  // Convert duty cycle % to OCR1B value
+  long pwmValue = map(dutyCycle, 0, 100, 0, OCR1A); // scale to timer top
 
-    // Set the PWM output based on the received value
-    OCR1B = pwmValue;
-  }
+  OCR1B = pwmValue; // update PWM
+
+  // Optional debug output
+  Serial.print("Potentiometer: "); Serial.print(potValue);
+  Serial.print(" | Duty Cycle: "); Serial.print(dutyCycle);
+  Serial.print("% | PWM Value: "); Serial.println(pwmValue);
+
+  delay(100); // smooth update
   
   }
