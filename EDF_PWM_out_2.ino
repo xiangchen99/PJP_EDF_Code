@@ -8,7 +8,7 @@ const byte POTENTIOMETER = A0;
 // set the frequency you want the PWM signal
 const long FREQUENCY = 8000;
 // set the bounds of the duty cycle of the PWM in %
-const int MAX_PWM_BOUND = 90;
+const int MAX_PWM_BOUND = 85;
 const int MIN_PWM_BOUND = 60;
 int receivedDutyCycle;
 bool newDataReceived;
